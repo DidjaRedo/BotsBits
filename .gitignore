@@ -1,0 +1,56 @@
+coverage/
+doc/
+reports/
+generated/
+.build.properties
+node_modules_prod/
+
+
+# Created by http://www.gitignore.io
+
+### Node ###
+lib-cov
+lcov.info
+*.seed
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
+
+pids
+logs
+results
+build
+.grunt
+
+node_modules
+package-lock.json
+
+### Linux ###
+*~
+
+
+### OSX ###
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must ends with two \r.
+Icon
+
+
+# Thumbnails
+._*
+
+### Webstorm project files ###
+.idea
+*.iml
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+# VS Code
+.vscode
