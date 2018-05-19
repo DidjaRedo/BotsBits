@@ -7,16 +7,15 @@
     "lib": "lib",
     "test": "test"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.1.0",
-    "jasmine-node": "^1.14.5"
-  },
-  "devDependencies": {
+    "jasmine-node": "^1.14.5",
     "istanbul": "^0.4.5"
   },
   "scripts": {
@@ -24,6 +23,7 @@
     "cover": "istanbul cover --include-all-sources jasmine-node --color --verbose --junitreport --captureExceptions --forceexit --test-dir test/unit",
     "lint": "eslint lib test/unit"
   },
+  "repository": "https://github.com/DidjaRedo/RotomBits",
   "author": "Erik Fortune",
   "license": "MIT"
 }
