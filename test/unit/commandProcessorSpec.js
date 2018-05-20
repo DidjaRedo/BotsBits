@@ -175,5 +175,4 @@ describe("commands", function () {
             expect(result.result).toBeUndefined();
         });
     });
-
 });
