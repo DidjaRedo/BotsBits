@@ -4,8 +4,8 @@ var CommandProcessor = require("../../lib/commandProcessor.js");
 
 describe("commands", function () {
     let goodCommands = [
-        { name: "Command 1", description: "Description", pattern: /^.*$/, handleCommand: function (matches) { return matches[0]; } },
-        { name: "Command 2", description: "Another Description", pattern: /^This is\s(.*)\.$/, handleCommand: function (matches) { return matches[1]; } },
+        { name: "Command 1", description: "Specific command", pattern: /^This is\s(.*)\.$/, handleCommand: function (matches) { return matches[1]; } },
+        { name: "Command 2", description: "Catch all command", pattern: /^.*test.*$/, handleCommand: function (matches) { return matches[0]; } },
     ];
     let badCommands = {
         "missing name": {
@@ -127,8 +127,53 @@ describe("commands", function () {
         it("should process all matching commands", function () {
             let result = cmds.processAll("This is a test.");
             expect(result.length).toBe(2);
-            expect(result[0]).toBe("This is a test.");
-            expect(result[1]).toBe("a test");
+            expect(result[0]).toBe("a test");
+            expect(result[1]).toBe("This is a test.");
+        });
+        it("should return an empty array if no command matches", function () {
+            let result = cmds.processAll("An example");
+            expect(result.length).toBe(0);
         });
     });
+
+    describe("processFirst", function () {
+        let cmds = new CommandProcessor(goodCommands);
+        it("should process only the first matching command", function () {
+            let result = cmds.processFirst("A test, this is.");
+            expect(result.found).toBe(true);
+            expect(result.result).toBe("A test, this is.");
+
+            result = cmds.processFirst("This is a test.");
+            expect(result.found).toBe(true);
+            expect(result.result).toBe("a test");
+        });
+
+        it("should return found===false if no command matches", function () {
+            let result = cmds.processFirst("An example");
+            expect(result.found).toBe(false);
+            expect(result.result).toBeUndefined();
+        });
+    });
+
+    describe("processOne", function () {
+        let cmds = new CommandProcessor(goodCommands);
+        it("should process exactly one matching command", function () {
+            let result = cmds.processOne("A test, this is.");
+            expect(result.found).toBe(true);
+            expect(result.result).toBe("A test, this is.");
+        });
+
+        it("should throw if more than one command matches", function () {
+            expect(function () {
+                cmds.processOne("This is a test.");
+            }).toThrow("Ambiguous command \"This is a test.\" could be \"Command 1\" or \"Command 2\".");
+        });
+
+        it("should return found===false if no command matches", function () {
+            let result = cmds.processFirst("An example");
+            expect(result.found).toBe(false);
+            expect(result.result).toBeUndefined();
+        });
+    });
+
 });
