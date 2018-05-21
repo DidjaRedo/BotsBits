@@ -10,11 +10,11 @@ function makeAmbiguousTimeString(date) {
 }
 
 describe("flexTime", function () {
-    describe("constructor", function () {
+    describe("constructor", () => {
         let morning = new Date(2018, 1, 1, 6, 10);
         let evening = new Date(2018, 1, 1, 18, 10);
 
-        it("should parse unambiguous 12- or 24-hour times without regard for time of day", function () {
+        it("should parse unambiguous 12- or 24-hour times without regard for time of day", () => {
             [
                 { string: "0000", hour: 0, minutes: 0 },
                 { string: "0100", hour: 1, minutes: 0 },
@@ -31,16 +31,16 @@ describe("flexTime", function () {
                 { string: "12:12 PM", hour: 12, minutes: 12 },
             ].forEach(function (test) {
                 let time = new FlexTime(test.string, morning);
-                expect(time.hour).toBe(test.hour);
-                expect(time.minutes).toBe(test.minutes);
+                expect(time.getHours()).toBe(test.hour);
+                expect(time.getMinutes()).toBe(test.minutes);
 
                 time = new FlexTime(test.string, evening);
-                expect(time.hour).toBe(test.hour);
-                expect(time.minutes).toBe(test.minutes);
+                expect(time.getHours()).toBe(test.hour);
+                expect(time.getMinutes()).toBe(test.minutes);
             });
         });
 
-        it("should adjust ambiguous times depending on time of day", function () {
+        it("should adjust ambiguous times depending on time of day", () => {
             [
                 { string: "100", morning: 13, evening: 1, minutes: 0 },
                 { string: "605", morning: 18, evening: 6, minutes: 5 },
@@ -49,43 +49,45 @@ describe("flexTime", function () {
                 { string: "11:59", morning: 11, evening: 23, minutes: 59 },
             ].forEach(function (test) {
                 let time = new FlexTime(test.string, morning);
-                expect(time.hour).toBe(test.morning);
-                expect(time.minutes).toBe(test.minutes);
+                expect(time.getHours()).toBe(test.morning);
+                expect(time.getMinutes()).toBe(test.minutes);
 
                 time = new FlexTime(test.string, evening);
-                expect(time.hour).toBe(test.evening);
-                expect(time.minutes).toBe(test.minutes);
+                expect(time.getHours()).toBe(test.evening);
+                expect(time.getMinutes()).toBe(test.minutes);
             });
         });
 
-        it("should use the current time if no time is specified", function () {
+        it("should use the current time if no time is specified", () => {
             let thirtyMinutesInMilliseconds = 30 * 60 * 1000;
             let future = new Date(Date.now() + thirtyMinutesInMilliseconds);
             let past = new Date(Date.now() - thirtyMinutesInMilliseconds);
 
             let time = new FlexTime(makeAmbiguousTimeString(future));
             let expected = future.getHours();
-            expect(time.hour).toBe(expected);
+            expect(time.getHours()).toBe(expected);
 
             time = new FlexTime(makeAmbiguousTimeString(past));
             expected = (past.getHours() + 12) % 24;
-            expect(time.hour).toBe(expected);
+            expect(time.getHours()).toBe(expected);
+
+            let date = new Date();
+            time = new FlexTime();
+            expect(time.getHours()).toBe(date.getHours());
+            expect(time.getMinutes()).toBe(date.getMinutes());
         });
 
-        it("should throw for invalid time strings", function () {
+        it("should throw for invalid time strings", () => {
             [
                 "12345", "12", "fred", "2515", "875", "123:4", "8:00 ama", "2300 am",
             ].forEach(function (test) {
-                expect(function () {
-                    let time = new FlexTime(test);
-                    expect(time).toBeUndefined();
-                }).toThrowError(Error, `Invalid flextime "${test}".`);
+                expect(() => new FlexTime(test)).toThrowError(Error, `Invalid time string "${test}".`);
             });
         });
     });
 
-    describe("getFlexTime method", function () {
-        it("should use Date or time in milliseconds and delta if supplied", function () {
+    describe("getFlexTime static method", () => {
+        it("should use Date or time in milliseconds and delta if supplied", () => {
             let now = new Date(2018, 1, 1, 11, 11, 11);
             let nowTime = now.getTime();
             [
@@ -96,12 +98,12 @@ describe("flexTime", function () {
                 { string: undefined, hour: 11, minutes: 11 },
             ].forEach(function (test) {
                 let time = FlexTime.getFlexTime(now, test.string);
-                expect(time.hour).toBe(test.hour);
-                expect(time.minutes).toBe(test.minutes);
+                expect(time.getHours()).toBe(test.hour);
+                expect(time.getMinutes()).toBe(test.minutes);
 
                 time = FlexTime.getFlexTime(nowTime, test.string);
-                expect(time.hour).toBe(test.hour);
-                expect(time.minutes).toBe(test.minutes);
+                expect(time.getHours()).toBe(test.hour);
+                expect(time.getMinutes()).toBe(test.minutes);
             });
         });
 
@@ -109,13 +111,67 @@ describe("flexTime", function () {
             let flexNow = FlexTime.getFlexTime();
             let now = new Date();
             let dateFromFlex = new Date();
-            dateFromFlex.setHours(flexNow.hour);
-            dateFromFlex.setMinutes(flexNow.minutes);
+            dateFromFlex.setHours(flexNow.getHours());
+            dateFromFlex.setMinutes(flexNow.getMinutes());
             // 5 seconds should be plenty of fudge.  This test might also fail
             // right at midnight if flexNow and now happen to land on different
             // days.
             let delta = dateFromFlex.getTime() - now.getTime();
             expect(delta).toBeLessThan(5000);
         });
+    });
+
+    describe("toDate method", () => {
+        it("should return accept baseDate as a number or a date", () => {
+            const baseDate = new Date(2018, 1, 1, 14, 0);
+            const futureDate = new Date(baseDate.getTime() + 300 * 1000);
+            const flex = new FlexTime("", futureDate);
+
+            let dateFromFlex = flex.toDate(undefined, baseDate);
+            expect(dateFromFlex.getUTCDate()).toEqual(baseDate.getUTCDate());
+
+            dateFromFlex = flex.toDate(undefined, baseDate.getTime());
+            expect(dateFromFlex.getUTCDate()).toEqual(baseDate.getUTCDate());
+        });
+
+        it("should return today's date for a time later than now", () => {
+            const baseDate = new Date(2018, 1, 1, 14, 0);
+            const futureDate = new Date(baseDate.getTime() + 300 * 1000);
+            const flex = new FlexTime("", futureDate);
+            const dateFromFlex = flex.toDate(undefined, baseDate);
+            expect(dateFromFlex.getUTCDate()).toEqual(baseDate.getUTCDate());
+        });
+
+        it("should return tomorrow's date for a time earlier than now", () => {
+            const baseDate = new Date(2018, 1, 1, 14, 0);
+            const pastDate = new Date(baseDate.getTime() - 300 * 1000);
+            const flex = new FlexTime("", pastDate);
+            const dateFromFlex = flex.toDate(undefined, baseDate);
+            expect(dateFromFlex.getUTCDate()).not.toEqual(baseDate.getUTCDate());
+        });
+
+        it("should apply a fudge factor if supplied", () => {
+            const baseDate = new Date(2018, 1, 1, 14, 0);
+            const pastDate = new Date(baseDate.getTime() - 300 * 1000);
+            const flex = new FlexTime("", pastDate);
+            const dateFromFlex = flex.toDate(10, baseDate);
+            expect(dateFromFlex.getUTCDate()).toEqual(baseDate.getUTCDate());
+        });
+
+        it("should use now if no base date is supplied", () => {
+            const futureDate = new Date(Date.now() + 300 * 1000);
+            const pastDate = new Date(Date.now() - 300 * 1000);
+            const futureFlex = new FlexTime("", futureDate);
+            const pastFlex = new FlexTime("", pastDate);
+            const futureDateFromFlex = futureFlex.toDate();
+            const pastDateFromFlex = pastFlex.toDate();
+            const nowUTCDate = new Date().getUTCDate();
+            expect(futureDateFromFlex.getUTCDate()).toEqual(nowUTCDate);
+            expect(pastDateFromFlex.getUTCDate()).not.toEqual(nowUTCDate);
+        });
+    });
+
+    describe("getDeltaInMinutes", () => {
+
     });
 });
