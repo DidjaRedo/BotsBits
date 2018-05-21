@@ -15,12 +15,12 @@
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.1.0",
-    "jasmine-node": "^1.14.5",
-    "istanbul": "^0.4.5"
+    "istanbul": "^0.4.5",
+    "jasmine": "^3.1.0"
   },
   "scripts": {
-    "test": "jasmine-node --color --verbose --junitreport --captureExceptions --forceexit --test-dir test/unit",
-    "cover": "istanbul cover --include-all-sources jasmine-node --color --verbose --junitreport --captureExceptions --forceexit --test-dir test/unit",
+    "test": "jasmine --config=test/support/jasmine.json",
+    "cover": "istanbul cover --include-all-sources jasmine -- --config=test/support/jasmine.json",
     "lint": "eslint lib test/unit"
   },
   "repository": "https://github.com/DidjaRedo/RotomBits",
