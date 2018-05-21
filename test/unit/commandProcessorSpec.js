@@ -1,6 +1,6 @@
 "use strict";
 
-var CommandProcessor = require("../../lib/commandProcessor.js");
+var CommandProcessor = require("../../index").CommandProcessor;
 
 describe("commands", function () {
     let goodCommands = [

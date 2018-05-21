@@ -1,6 +1,6 @@
 "use strict";
 
-var FlexTime = require("../../lib/flexTime.js");
+var FlexTime = require("../../index").FlexTime;
 
 function makeAmbiguousTimeString(date) {
     let hours = (date.getHours() % 12);
@@ -81,6 +81,34 @@ describe("flexTime", function () {
                     expect(time).toBeUndefined();
                 }).toThrow("Invalid flextime \"" + test + "\".");
             });
+        });
+    });
+
+    describe("getFlexTime method", function () {
+        it("should use Date or time in milliseconds and delta if supplied", function () {
+            let now = new Date(2018, 1, 1, 11, 11, 11);
+            let nowTime = now.getTime();
+            [
+                { string: "20", hour: 11, minutes: 31 },
+                { string: "-20", hour: 10, minutes: 51 },
+                { string: "60", hour: 12, minutes: 11 },
+                { string: "120", hour: 13, minutes: 11 },
+                { string: undefined, hour: 11, minutes: 11 },
+            ].forEach(function (test) {
+                let time = FlexTime.getFlexTime(now, test.string);
+                expect(time.hour).toBe(test.hour);
+                expect(time.minutes).toBe(test.minutes);
+
+                time = FlexTime.getFlexTime(nowTime, test.string);
+                expect(time.hour).toBe(test.hour);
+                expect(time.minutes).toBe(test.minutes);
+            });
+        });
+
+        it("should use the current time if no time is supplied", function () {
+            let flexNow = FlexTime.getFlexTime();
+            let now = new Date();
+
         });
     });
 });
