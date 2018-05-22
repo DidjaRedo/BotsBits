@@ -77,6 +77,13 @@ describe("flexTime", function () {
             expect(time.getMinutes()).toBe(date.getMinutes());
         });
 
+        it("should initialize from another flex time", () => {
+            let time = new FlexTime(new Date(2018, 1, 1, 12, 0));
+            let newTime = new FlexTime(time);
+            expect(time.getHours()).toEqual(newTime.getHours());
+            expect(time.getMinutes()).toEqual(newTime.getMinutes());
+        });
+
         it("should throw for invalid time strings", () => {
             [
                 "12345", "12", "fred", "2515", "875", "123:4", "8:00 ama", "2300 am",
@@ -87,7 +94,7 @@ describe("flexTime", function () {
     });
 
     describe("getFlexTime static method", () => {
-        it("should use Date or time in milliseconds and delta if supplied", () => {
+        it("should use Date, time in milliseconds, or FlexTime and delta if supplied", () => {
             let now = new Date(2018, 1, 1, 11, 11, 11);
             let nowTime = now.getTime();
             [
@@ -102,6 +109,11 @@ describe("flexTime", function () {
                 expect(time.getMinutes()).toBe(test.minutes);
 
                 time = FlexTime.getFlexTime(nowTime, test.string);
+                expect(time.getHours()).toBe(test.hour);
+                expect(time.getMinutes()).toBe(test.minutes);
+
+                time = FlexTime.getFlexTime(now);
+                time = FlexTime.getFlexTime(time, test.string);
                 expect(time.getHours()).toBe(test.hour);
                 expect(time.getMinutes()).toBe(test.minutes);
             });
