@@ -84,12 +84,23 @@ describe("flexTime", function () {
             expect(time.getMinutes()).toEqual(newTime.getMinutes());
         });
 
+        it("should initiialize from a Date object", () => {
+            let date = new Date();
+            let time = new FlexTime(date);
+            expect(time.getHours()).toBe(date.getHours());
+            expect(time.getMinutes()).toBe(date.getMinutes());
+        });
+
         it("should throw for invalid time strings", () => {
             [
                 "12345", "12", "fred", "2515", "875", "123:4", "8:00 ama", "2300 am",
             ].forEach(function (test) {
                 expect(() => new FlexTime(test)).toThrowError(Error, `Invalid time string "${test}".`);
             });
+        });
+
+        it("should throw for an invalid initializer", () => {
+            expect(() => new FlexTime({})).toThrow();
         });
     });
 
