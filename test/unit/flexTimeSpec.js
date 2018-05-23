@@ -183,6 +183,54 @@ describe("flexTime", function () {
         });
     });
 
+    describe("toString method", () => {
+        it("should return properly formatted strings", () => {
+            [
+                ["0015", "00", "12", "15", "am"],
+                ["0620", "06", "06", "20", "am"],
+                ["1230 pm", "12", "12", "30", "pm"],
+                ["2359", "23", "11", "59", "pm"],
+            ].forEach((test) => {
+                let time = new FlexTime(test[0]);
+                let expected = `${test[1]}${test[3]}`;
+                expect(time.toString("HHMM")).toBe(expected);
+                expect(time.toString("HHmm")).toBe(expected);
+
+                expected = `${test[1]}:${test[3]}`;
+                expect(time.toString("HH:MM")).toBe(expected);
+                expect(time.toString("HH:mm")).toBe(expected);
+
+                expected = `${Number(test[2])}${test[3]} ${test[4].toLowerCase()}`;
+                expect(time.toString("hhmm tt")).toBe(expected);
+                expect(time.toString("hhMM tt")).toBe(expected);
+
+                expected = `${Number(test[2])}${test[3]} ${test[4].toUpperCase()}`;
+                expect(time.toString("hhmm TT")).toBe(expected);
+                expect(time.toString("hhMM TT")).toBe(expected);
+
+                expected = `${Number(test[2])}${test[3]}${test[4][0].toLowerCase()}`;
+                expect(time.toString("hhmmt")).toBe(expected);
+                expect(time.toString("hhMMt")).toBe(expected);
+
+                expected = `${Number(test[2])}${test[3]}${test[4][0].toUpperCase()}`;
+                expect(time.toString("hhmmT")).toBe(expected);
+                expect(time.toString("hhMMT")).toBe(expected);
+            });
+        });
+
+        it("should default to 12-hour lower case format", () => {
+            [
+                ["0015", "12:15 am"],
+                ["0620", "6:20 am"],
+                ["1230 pm", "12:30 pm"],
+                ["2359", "11:59 pm"],
+            ].forEach((test) => {
+                let time = new FlexTime(test[0]);
+                expect(time.toString()).toBe(test[1]);
+            });
+        });
+    });
+
     describe("getDeltaInMinutes", () => {
 
     });
