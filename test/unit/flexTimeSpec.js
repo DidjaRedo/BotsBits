@@ -47,6 +47,7 @@ describe("flexTime", function () {
                 { string: "615", morning: 6, evening: 18, minutes: 15 },
                 { string: "112", morning: 13, evening: 1, minutes: 12 },
                 { string: "11:59", morning: 11, evening: 23, minutes: 59 },
+                { string: "1215", morning: 12, evening: 0, minutes: 15 },
             ].forEach(function (test) {
                 let time = new FlexTime(test.string, morning);
                 expect(time.getHours()).toBe(test.morning);
@@ -87,6 +88,13 @@ describe("flexTime", function () {
         it("should initiialize from a Date object", () => {
             let date = new Date();
             let time = new FlexTime(date);
+            expect(time.getHours()).toBe(date.getHours());
+            expect(time.getMinutes()).toBe(date.getMinutes());
+        });
+
+        it("should initialize from an time in milliseconds", () => {
+            let date = new Date();
+            let time = new FlexTime(date.getTime());
             expect(time.getHours()).toBe(date.getHours());
             expect(time.getMinutes()).toBe(date.getMinutes());
         });
