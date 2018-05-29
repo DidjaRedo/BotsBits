@@ -173,6 +173,14 @@ describe("flexTime", function () {
             expect(dateFromFlex.getUTCDate()).toEqual(baseDate.getUTCDate());
         });
 
+        it("should return tomorrow's date for a time more than 12 hours later than now", () => {
+            const baseDate = new Date(2018, 1, 1, 14, 0);
+            const futureDate = new Date(baseDate.getTime() + (13 * 60 * 60 * 1000));
+            const flex = new FlexTime("", futureDate);
+            const dateFromFlex = flex.toDate(undefined, baseDate);
+            expect(dateFromFlex.getUTCDate()).not.toEqual(baseDate.getUTCDate());
+        });
+
         it("should return tomorrow's date for a time earlier than now", () => {
             const baseDate = new Date(2018, 1, 1, 14, 0);
             const pastDate = new Date(baseDate.getTime() - 300 * 1000);
