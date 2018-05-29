@@ -266,4 +266,20 @@ describe("flexTime", function () {
             });
         });
     });
+
+    describe("getAbsoluteDeltaInMinutes", () => {
+        it("should not choose the nearest possible time", () => {
+            [
+                ["1130am", "1230pm", 60],
+                ["2345", "0015", -(23.5 * 60)],
+                ["1215pm", "1145am", -30],
+                ["0030", "2330", (23 * 60)],
+                ["0601", "1759", 12 * 60 - 2],
+            ].forEach((test) => {
+                let t1 = new FlexTime(test[0]);
+                let t2 = new FlexTime(test[1]);
+                expect(t1.getAbsoluteDeltaInMinutes(t2)).toBe(test[2]);
+            });
+        });
+    });
 });
